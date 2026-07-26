@@ -47,9 +47,13 @@ TAG="${GIT_SHA}-$(date -u +%Y%m%d%H%M%S)"
 
 echo "==> Building image ${REPOSITORY_URI}:${TAG}"
 # The task definition pins linux/amd64, so build for it explicitly rather than
-# inheriting the host architecture.
+# inheriting the host architecture. Provenance attestations are disabled
+# because they push extra untagged manifests that the ECR lifecycle rules would
+# then have to reason about.
 docker build \
   --platform linux/amd64 \
+  --provenance=false \
+  --sbom=false \
   -t "${REPOSITORY_URI}:${TAG}" \
   -t "${REPOSITORY_URI}:latest" \
   "$REPO_ROOT"

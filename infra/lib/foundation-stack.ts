@@ -22,9 +22,15 @@ export class FoundationStack extends cdk.Stack {
       imageScanOnPush: true,
       imageTagMutability: ecr.TagMutability.MUTABLE,
       encryption: ecr.RepositoryEncryption.AES_256,
+      // Deliberately no rule targeting untagged images. When a push produces a
+      // manifest list, the platform manifest underneath it is itself untagged,
+      // and expiring it would break new task launches while the tagged index
+      // still appears healthy. Counting by total image age avoids that trap.
       lifecycleRules: [
         {
           description: "Keep the 10 most recent images",
+          rulePriority: 1,
+          tagStatus: ecr.TagStatus.ANY,
           maxImageCount: 10,
         },
       ],
