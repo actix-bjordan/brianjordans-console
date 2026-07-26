@@ -1,0 +1,17 @@
+{
+  "name": "brianjordans-console",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Management console for brianjordans.com: React SPA served by a Fastify server behind Google SSO",
+  "scripts": {
+    "install:all": "npm --prefix app install && npm --prefix server install && npm --prefix infra install",
+    "build": "npm --prefix app run build && npm --prefix server run build",
+    "typecheck": "npm --prefix server run typecheck",
+    "up": "docker compose up --build",
+    "down": "docker compose down -v",
+    "deploy": "bash scripts/deploy.sh",
+    "deploy:foundation": "cd infra && npx cdk deploy BrianJordansConsoleFoundation",
+    "deploy:infra": "cd infra && npx cdk deploy BrianJordansConsole",
+    "diff": "cd infra && npx cdk diff"
+  }
+}

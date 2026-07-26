@@ -3,6 +3,10 @@ node_modules/
 
 # Build output
 app/dist/
+server/dist/
+
+# Local secrets for docker compose
+.env
 
 # CDK synthesized output and deploy outputs (regenerated on each deploy)
 infra/cdk.out/

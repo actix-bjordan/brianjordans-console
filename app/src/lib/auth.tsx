@@ -1,53 +1,67 @@
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { api } from "./api";
+
+export type Role = "admin" | "member";
 
 export interface ConsoleUser {
-  name: string;
   email: string;
+  firstName: string;
+  lastName: string;
+  role: Role;
 }
 
 interface AuthState {
   user: ConsoleUser | null;
-  signInWithGoogle: () => void;
-  signOut: () => void;
+  loading: boolean;
+  isAdmin: boolean;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
 
-const SESSION_KEY = "bj-console-preview-session";
-
 /**
- * Placeholder session handling.
- *
- * No identity provider is wired up yet, so "signing in" only records a
- * local marker that lets the shell render. Replace the body of
- * signInWithGoogle/signOut with the Cognito Hosted UI redirect and token
- * exchange, and read the real identity here. Nothing sensitive belongs in
- * this console until that swap happens.
+ * The session is an httpOnly cookie the server owns, so there is nothing to
+ * read here. Identity comes from the server, and the server has already
+ * refused to serve this bundle to anyone without a valid session.
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<ConsoleUser | null>(() => {
-    const stored = sessionStorage.getItem(SESSION_KEY);
-    return stored ? (JSON.parse(stored) as ConsoleUser) : null;
-  });
+  const [user, setUser] = useState<ConsoleUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const signInWithGoogle = useCallback(() => {
-    const previewUser: ConsoleUser = {
-      name: "Brian Jordan",
-      email: "contact@brianjordans.com",
+  useEffect(() => {
+    let cancelled = false;
+
+    api
+      .get<ConsoleUser>("/api/me")
+      .then((me) => {
+        if (!cancelled) setUser(me);
+      })
+      .catch(() => {
+        // The gate should have redirected already; this covers a session that
+        // expired while the tab was open.
+        window.location.href = "/login";
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
     };
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(previewUser));
-    setUser(previewUser);
   }, []);
 
-  const signOut = useCallback(() => {
-    sessionStorage.removeItem(SESSION_KEY);
-    setUser(null);
+  const signOut = useCallback(async () => {
+    try {
+      await api.post("/auth/logout", {});
+    } finally {
+      window.location.href = "/login?reason=signedout";
+    }
   }, []);
 
-  const value = useMemo(
-    () => ({ user, signInWithGoogle, signOut }),
-    [user, signInWithGoogle, signOut],
+  const value = useMemo<AuthState>(
+    () => ({ user, loading, isAdmin: user?.role === "admin", signOut }),
+    [user, loading, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

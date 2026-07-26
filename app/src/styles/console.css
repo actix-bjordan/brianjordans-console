@@ -175,57 +175,161 @@ p { margin: 0 0 1rem; }
   margin: 0;
 }
 
-/* ---------- Login ---------- */
+/* ---------- Loading ---------- */
 
-.auth-shell {
+.app-loading {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 3rem 1.25rem;
-}
-
-.auth-card {
-  width: 100%;
-  max-width: 30rem;
-  padding: 2.75rem;
-  text-align: center;
-}
-
-.auth-title {
-  font-size: clamp(1.4rem, 1.1rem + 1.3vw, 1.85rem);
-  margin-bottom: 0.75rem;
-}
-
-.auth-subtitle {
-  margin-bottom: 2rem;
-  color: var(--text-secondary);
-}
-
-.btn-google {
-  width: 100%;
-  justify-content: center;
-  background: #fff;
-  color: #1f1f1f;
-  border-color: #dadce0;
-  font-size: 1rem;
-  padding: 0.8rem 1.4rem;
-}
-
-.btn-google:hover {
-  background: #f4f6fb;
-  border-color: #c6cbd4;
-}
-
-.auth-note {
-  margin: 1.5rem 0 0;
-  font-size: 0.85rem;
   color: var(--text-muted);
+  font-size: 0.95rem;
 }
 
-.auth-back {
-  margin-top: 2rem;
-  font-size: 0.85rem;
+/* ---------- Alerts ---------- */
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  border: 1px solid var(--border-strong);
+  margin-bottom: 1.5rem;
+}
+
+.alert-error {
+  color: var(--danger);
+  border-color: rgba(240, 106, 106, 0.4);
+  background: rgba(240, 106, 106, 0.08);
+}
+
+/* ---------- Forms ---------- */
+
+.user-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.field label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.data-table select {
+  background: var(--navy-950);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: 0.55rem 0.7rem;
+  font-size: 0.92rem;
+  font-family: inherit;
+  min-width: 0;
+}
+
+.field input:focus,
+.field select:focus,
+.data-table select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.field select:disabled,
+.data-table select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.field-action {
+  justify-content: flex-end;
+}
+
+/* ---------- Directory table ---------- */
+
+.pill {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--border-strong);
+}
+
+.pill-ok {
+  color: var(--success);
+  border-color: rgba(79, 201, 138, 0.4);
+  background: rgba(79, 201, 138, 0.1);
+}
+
+.pill-off {
+  color: var(--text-muted);
+  background: rgba(110, 126, 163, 0.12);
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.btn-danger {
+  color: var(--danger);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: rgba(240, 106, 106, 0.1);
+  color: var(--danger);
+}
+
+.badge-inline {
+  margin-left: 0.5rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--accent-soft);
+  color: var(--accent-bright);
+  border: 1px solid var(--border-strong);
+}
+
+/* ---------- Sidebar identity ---------- */
+
+.sidebar-user {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sidebar-user-name {
+  color: var(--text-secondary);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-user-email {
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ---------- App shell ---------- */

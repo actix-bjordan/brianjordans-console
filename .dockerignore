@@ -1,0 +1,11 @@
+**/node_modules
+**/dist
+**/cdk.out
+**/.git
+**/*.log
+infra
+scripts
+.env
+.env.*
+docker-compose.yml
+README.md

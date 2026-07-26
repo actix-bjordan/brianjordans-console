@@ -59,7 +59,7 @@ export default function Dashboard() {
             <li className="status-row">
               <span className="status-dot status-ok" aria-hidden="true" />
               <span className="status-row-name">app.brianjordans.com</span>
-              <span className="status-row-meta">CloudFront</span>
+              <span className="status-row-meta">ECS Fargate</span>
             </li>
             <li className="status-row">
               <span className="status-dot status-ok" aria-hidden="true" />
@@ -67,9 +67,9 @@ export default function Dashboard() {
               <span className="status-row-meta">API Gateway</span>
             </li>
             <li className="status-row">
-              <span className="status-dot status-warn" aria-hidden="true" />
+              <span className="status-dot status-ok" aria-hidden="true" />
               <span className="status-row-name">Console authentication</span>
-              <span className="status-row-meta">Not configured</span>
+              <span className="status-row-meta">Google SSO</span>
             </li>
           </ul>
         </div>
