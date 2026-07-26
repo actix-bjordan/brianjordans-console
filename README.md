@@ -41,6 +41,9 @@ yet. Auth, RBAC, and hosting are real.
 - **BrianJordansConsole** — ACM certificate, VPC, ECS cluster, Fargate service,
   Application Load Balancer, and the Route 53 alias records.
 
+The console was previously static files on S3 and CloudFront. Both are gone;
+the alias records now point at the load balancer.
+
 The VPC has **public subnets only and no NAT gateway**; a NAT would cost more
 than the rest of the stack combined. The task gets a public IP so it can pull
 its image and reach Google's token endpoint, and its security group accepts
@@ -213,13 +216,52 @@ cd app && npm run dev   # http://localhost:5174
 | Disable a user in the UI | They are locked out within ~30 seconds |
 | A member calls `/api/users` | 403 |
 
+## Tagging and cost reporting
+
+Every resource carries the tag set in `infra/lib/tags.ts`, applied as a CDK
+aspect so nothing can be missed:
+
+| Tag | Value |
+|---|---|
+| `Project` | `brianjordans` |
+| `Application` | `management-console` |
+| `Environment` | `production` |
+| `Component` | `runtime` (service stack) or `data-and-registry` (foundation) |
+| `CostCenter` | `brianjordans-console` |
+| `Owner` | `contact@brianjordans.com` |
+| `ManagedBy` | `cdk` |
+| `Repository` | `actix-bjordan/brianjordans-console` |
+
+The ECS service sets `enableECSManagedTags` and propagates service tags to
+tasks, which is what split cost allocation reports against.
+
+Tags only work as cost allocation keys once activated in Billing, and AWS can
+take up to 24 hours to discover a newly used key. To activate any that are
+still showing as inactive:
+
+```bash
+aws ce list-cost-allocation-tags --status Inactive \
+  --query 'CostAllocationTags[?Type==`UserDefined`].TagKey' --output text
+
+aws ce update-cost-allocation-tags-status --cost-allocation-tags-status \
+  TagKey=Application,Status=Active TagKey=CostCenter,Status=Active \
+  TagKey=Owner,Status=Active TagKey=Repository,Status=Active
+```
+
+Cost Explorer then groups by any active key, and the same keys work as budget
+filters. Data only accrues from the activation date forward; it is not
+backfilled.
+
 ## Resources
 
 | Resource | Value |
 |---|---|
 | Console URL | https://app.brianjordans.com |
 | ECR repository | `brianjordans-console` |
-| ECS cluster / service | see the `ClusterName` / `ServiceName` stack outputs |
+| ECS cluster | `BrianJordansConsole-ConsoleCluster64F3213E-zNoWZNf0nLJd` |
+| ECS service | `brianjordans-console` |
+| Load balancer | `BrianJ-Conso-S52us01qSHL2-1845286506.us-east-1.elb.amazonaws.com` |
+| Users table | `BrianJordansConsoleFoundation-UsersTable9725E9C8-AIUZY55W4D42` |
 | Route 53 hosted zone (owned by website repo) | `Z00406963PWDGGJZA3WA2` |
 
 ## Running cost

@@ -1,6 +1,7 @@
 import * as cdk from "aws-cdk-lib";
 import { ConsoleStack } from "../lib/console-stack.js";
 import { FoundationStack } from "../lib/foundation-stack.js";
+import { applyStandardTags } from "../lib/tags.js";
 
 const app = new cdk.App();
 
@@ -17,23 +18,22 @@ const hostedZoneId = "Z00406963PWDGGJZA3WA2";
 
 const customDomain = app.node.tryGetContext("customDomain") !== "false";
 
-// Until the cutover, app.brianjordans.com still resolves to the old static
-// distribution and the container is verified on the load balancer hostname.
-// Deploy with `-c legacyStatic=false` to flip DNS and retire the static stack.
-const legacyStatic = app.node.tryGetContext("legacyStatic") !== "false";
-
 const bootstrapAdminEmail =
   app.node.tryGetContext("bootstrapAdminEmail") ?? "contact@brianjordans.com";
 
 const foundation = new FoundationStack(app, "BrianJordansConsoleFoundation", { env });
 
-new ConsoleStack(app, "BrianJordansConsole", {
+const consoleStack = new ConsoleStack(app, "BrianJordansConsole", {
   env,
   domainName,
   hostedZoneId,
   customDomain,
-  legacyStatic,
   repository: foundation.repository,
   usersTable: foundation.usersTable,
   bootstrapAdminEmail,
 });
+
+// Storage and the image registry outlive any single deployment of the service,
+// so they are billed and reported separately from the running workload.
+applyStandardTags(foundation, "data-and-registry");
+applyStandardTags(consoleStack, "runtime");
